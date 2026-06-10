@@ -70,6 +70,11 @@ Lossy or ambiguous field mappings emit warnings.
 Output directories are created automatically. Existing files are not
 overwritten unless `--force` is set.
 
+## Third-party specifications
+
+Native rule formats and documentation links for each supported agent. See
+[docs/third-party-specs.md](docs/third-party-specs.md).
+
 ## Maintaining vendored spec
 
 See [docs/maintenance.md](docs/maintenance.md).
