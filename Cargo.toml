@@ -1,0 +1,36 @@
+[workspace]
+members = [".", "xtask"]
+resolver = "2"
+
+[package]
+name = "agent-rules-tool"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Lint and migrate agent rules per agent-rules-spec"
+readme = "README.md"
+
+[lib]
+name = "agent_rules_tool"
+path = "src/lib.rs"
+
+[[bin]]
+name = "agent-rules-tool"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+markdown-frontmatter = { version = "0.5", features = ["yaml"] }
+jsonschema = "0.46"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+serde-saphyr = "0.0.27"
+tokio = { version = "1", features = ["fs", "macros", "rt-multi-thread"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+thiserror = "2"
+
+[dev-dependencies]
+clap = { version = "4", features = ["derive", "debug"] }
+tempfile = "3"
