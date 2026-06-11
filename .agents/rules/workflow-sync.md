@@ -7,6 +7,7 @@ paths:
   - ".rumdl.toml"
   - ".agents/rules/rust-quality.md"
   - ".agents/rules/markdown-quality.md"
+  - ".agents/rules/agent-rules-lint.md"
   - "xtask/**"
   - "docs/maintenance.md"
   - "**/Cargo.toml"
@@ -18,15 +19,37 @@ paths:
 
 When changing files that affect CI, keep workflows and agent rules aligned.
 
+## PR workflow (`ci.yml`)
+
+Pull requests and pushes to `main` run [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
+A `changes` job uses [`dorny/paths-filter`](https://github.com/dorny/paths-filter) so
+downstream jobs **skip** (and still satisfy required checks) when irrelevant paths
+did not change. Do **not** add workflow-level `paths:` filters to required checks.
+
+| Job (required check name) | Runs when paths match… | Agent rule / command |
+|---------------------------|------------------------|----------------------|
+| `CI (ubuntu-latest)` / `CI (macos-latest)` | `**/*.rs`, `**/Cargo.toml`, `rust-toolchain.toml`, `.github/workflows/ci.yml`, `.agents/rules/**` | [`rust-quality.md`](rust-quality.md), [`agent-rules-lint.md`](agent-rules-lint.md) |
+| `Markdown Hygiene` | `**/*.md`, `.rumdl.toml` | [`markdown-quality.md`](markdown-quality.md) |
+| `Check Spec` | `spec/**`, `xtask/**`, `docs/maintenance.md` | [`docs/maintenance.md`](../../docs/maintenance.md) |
+
+## Other workflows (not MR gates)
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| [`check-spec.yml`](../../.github/workflows/check-spec.yml) | Weekly cron, `workflow_dispatch` | Upstream drift alarm (same command as the PR job) |
+| [`release-plz.yml`](../../.github/workflows/release-plz.yml) | Push to `main` | Release PRs and crates.io publishing |
+
+## Sync checklist
+
 | When you change… | Also verify/update… |
 |------------------|---------------------|
-| [`.rumdl.toml`](../../.rumdl.toml) `include` | [`.github/workflows/rumdl.yml`](../../.github/workflows/rumdl.yml) `paths` filters |
-| [`.rumdl.toml`](../../.rumdl.toml) `exclude` | Keep vendored `spec/` out of rumdl (upstream examples, not repo-owned docs) |
-| [`markdown-quality.md`](markdown-quality.md) rumdl command/config | `rumdl.yml` action config |
-| [`rust-quality.md`](rust-quality.md) cargo commands or `paths` (`**/*.rs`, `**/Cargo.toml`) | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) steps (same fast-fail order, ending with `cargo publish -p agent-rules-tool --dry-run` on ubuntu) |
-| [`release-plz.toml`](../../release-plz.toml) | [`.github/workflows/release-plz.yml`](../../.github/workflows/release-plz.yml) (checkout, toolchain, action version, env) |
-| [`xtask`](../../xtask/) spec-update behavior or [`docs/maintenance.md`](../../docs/maintenance.md) | [`.github/workflows/check-spec.yml`](../../.github/workflows/check-spec.yml) |
-| Any workflow file | Use current action majors (`checkout@v6`, `rumdl@v0`, etc.); keep commands aligned with agent rules |
+| [`.rumdl.toml`](../../.rumdl.toml) `include` / `exclude` | `ci.yml` `changes` job `md` filter and rumdl job config |
+| [`markdown-quality.md`](markdown-quality.md) rumdl command/config | `ci.yml` rumdl job |
+| [`rust-quality.md`](rust-quality.md) cargo commands or `paths` | `ci.yml` `rust` filter and rust job steps (fast-fail order; publish dry-run on ubuntu) |
+| [`agent-rules-lint.md`](agent-rules-lint.md) paths or lint command | `ci.yml` `rules` filter (runs the rust job for rule-only edits) |
+| [`release-plz.toml`](../../release-plz.toml) | [`release-plz.yml`](../../.github/workflows/release-plz.yml) |
+| [`xtask`](../../xtask/) spec-update or [`docs/maintenance.md`](../../docs/maintenance.md) | `ci.yml` `spec` filter and [`check-spec.yml`](../../.github/workflows/check-spec.yml) |
+| Any workflow file | Current action majors (`checkout@v6`, `rumdl@v0`, etc.); commands aligned with agent rules |
 
 After editing rule or workflow files, run `rumdl check .` and
 `cargo run --bin agent-rules-tool -- lint -d .agents/rules`.

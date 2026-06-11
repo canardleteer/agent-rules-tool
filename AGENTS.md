@@ -67,7 +67,21 @@ does not natively load [agent-rules-spec](https://github.com/rameshsunkara/agent
 | `agent-rules-lint` | `.agents/rules/**` changes | rumdl → `cargo run … lint` (see rule for fallback) |
 | `workflow-sync` | CI/config paths (see rule) | keep `.github/workflows/` aligned with quality rules and `.rumdl.toml` |
 
-CI workflows live under [`.github/workflows/`](.github/workflows/).
+## CI
+
+Pull-request gates live in [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+path-aware jobs (via `dorny/paths-filter`) share one workflow so skipped jobs
+still satisfy required checks. Required status check names on `main`:
+
+* `CI (ubuntu-latest)` — Rust fmt, clippy, rule lint, tests, rustdoc, publish
+  dry-run, audit
+* `CI (macos-latest)` — same Rust pipeline on macOS
+* `Markdown Hygiene` — rumdl when `**/*.md` or `.rumdl.toml` changes
+* `Check Spec` — `cargo xtask spec-update check` when vendored spec paths change
+
+Post-merge / maintainer workflows (not MR gates): [`check-spec.yml`](.github/workflows/check-spec.yml)
+(weekly drift), [`release-plz.yml`](.github/workflows/release-plz.yml) (releases).
+See [`.agents/rules/workflow-sync.md`](.agents/rules/workflow-sync.md) when editing CI.
 
 For rule linting: if `cargo run` fails, alert the user that the dev path is
 broken; if the installed binary is also unavailable, alert the user that

@@ -26,4 +26,6 @@ in order (fast fail — stop and fix at the first failure):
 6. `cargo publish -p agent-rules-tool --dry-run` — package/manifest consistency
    check (does not upload; does not fail if the version is already on crates.io)
 
-This order matches [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
+This order matches the `CI (ubuntu-latest)` / `CI (macos-latest)` jobs in
+[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml). Those jobs run when
+Rust/manifest paths or `.agents/rules/**` change (job-level skip otherwise).
