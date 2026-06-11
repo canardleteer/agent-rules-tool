@@ -16,6 +16,18 @@ structured rules format.
 
 ## Install
 
+From [crates.io](https://crates.io/crates/agent-rules-tool):
+
+```bash
+cargo install agent-rules-tool --version '^0.1.0-rc'
+```
+
+That tracks the latest `0.1` pre-release during the RC cycle and will resolve
+to `0.1.0` once it is published. After stable `0.1.0`, plain
+`cargo install agent-rules-tool` also works.
+
+From this repository:
+
 ```bash
 cargo install --path .
 ```
@@ -25,6 +37,9 @@ Or build locally:
 ```bash
 cargo build --release
 ```
+
+Pre-built binaries for tagged releases are on
+[GitHub Releases](https://github.com/canardleteer/agent-rules-tool/releases).
 
 ## CLI
 

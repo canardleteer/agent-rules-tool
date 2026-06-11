@@ -53,6 +53,11 @@ When adding a new concern that maintainers or contributors need to read later,
 prefer a new `docs/<topic>.md` (and link it here) over duplicating detail in
 `AGENTS.md` or the README.
 
+**TODO (remove at `0.1.0`):** [`README.md`](README.md) Install uses
+`cargo install agent-rules-tool --version '^0.1.0-rc'` while only pre-releases
+are on crates.io. Once **`0.1.0`** is published, simplify to plain
+`cargo install agent-rules-tool` and delete this note.
+
 ## Agent rules
 
 Structured rules for this repo live in [`.agents/rules/`](.agents/rules/).
