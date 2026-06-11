@@ -48,6 +48,7 @@ did not change. Do **not** add workflow-level `paths:` filters to required check
 | [`rust-quality.md`](rust-quality.md) cargo commands or `paths` | `ci.yml` `rust` filter and rust job steps (fast-fail order; publish dry-run on ubuntu) |
 | [`agent-rules-lint.md`](agent-rules-lint.md) paths or lint command | `ci.yml` `rules` filter (runs the rust job for rule-only edits) |
 | [`release-plz.toml`](../../release-plz.toml) | [`release-plz.yml`](../../.github/workflows/release-plz.yml) |
+| [`release-plz/action`](../../.github/workflows/release-plz.yml) version bump | Transitive allowlist pins below (read `action.yml` for SHAs) |
 | [`xtask`](../../xtask/) spec-update or [`docs/maintenance.md`](../../docs/maintenance.md) | `ci.yml` `spec` filter and [`check-spec.yml`](../../.github/workflows/check-spec.yml) |
 | Any workflow file | Current action majors (`checkout@v6`, `paths-filter@v4`, `rumdl@v0`, etc.); commands aligned with agent rules |
 | New workflow file, new `uses:` action, or allowlist change | See [AGENTS.md § New workflows and third-party actions](../../AGENTS.md#new-workflows-and-third-party-actions): confirm with user → maintainer; verify latest safe pin; **never** update allowlist without explicit user approval |
@@ -61,6 +62,12 @@ user approval** — see [AGENTS.md](../../AGENTS.md#new-workflows-and-third-part
 * `dorny/paths-filter@v4`
 * `rustsec/audit-check@858dc40f52ca2b8570b7a997c1c4e35c6fc9a432`
 * `release-plz/action@v0.5.128`
+* `release-plz/git-config@59144859caf016f8b817a2ac9b051578729173c4`
+  (transitive via release-plz)
+* `taiki-e/install-action@f23382d582832e41d5eb4fff2bddb06bc5adf8d3`
+  (transitive via release-plz)
+* `cargo-bins/cargo-binstall@1800853f2578f8c34492ec76154caef8e163fbca`
+  (transitive via release-plz)
 * `rvben/rumdl@v0`
 
 After editing rule or workflow files, run `rumdl check .` and
