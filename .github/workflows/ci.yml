@@ -46,20 +46,15 @@ jobs:
               - 'xtask/**'
               - 'docs/maintenance.md'
 
-  rust:
-    name: CI (${{ matrix.os }})
+  # Separate jobs (not a matrix): skipped jobs must report names branch
+  # protection expects, not CI (${{ matrix.os }}).
+  rust-ubuntu:
+    name: CI (ubuntu-latest)
     needs: changes
     if: |
       needs.changes.outputs.rust == 'true' ||
       needs.changes.outputs.rules == 'true'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          # - windows-latest  # enable when Windows support is ready
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v6
@@ -70,7 +65,7 @@ jobs:
       - name: Cache cargo registry and build
         uses: Swatinem/rust-cache@v2
         with:
-          shared-key: ci-${{ matrix.os }}-all-features
+          shared-key: ci-ubuntu-latest-all-features
 
       - name: Check formatting
         run: cargo fmt --all -- --check
@@ -90,15 +85,50 @@ jobs:
         run: cargo doc --no-deps -p agent-rules-tool --all-features
 
       - name: Package consistency (publish dry-run)
-        if: matrix.os == 'ubuntu-latest'
         run: cargo publish -p agent-rules-tool --dry-run
 
       - name: Security audit
-        if: matrix.os == 'ubuntu-latest'
         # rustsec has yet to cut a new version: https://github.com/rustsec/audit-check/issues/47
         uses: rustsec/audit-check@858dc40f52ca2b8570b7a997c1c4e35c6fc9a432
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  rust-macos:
+    name: CI (macos-latest)
+    needs: changes
+    if: |
+      needs.changes.outputs.rust == 'true' ||
+      needs.changes.outputs.rules == 'true'
+    runs-on: macos-latest
+    # - windows-latest  # enable when Windows support is ready
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry and build
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ci-macos-latest-all-features
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+      - name: Lint agent rules
+        run: cargo run --bin agent-rules-tool -- lint -d .agents/rules
+
+      - name: Run tests
+        run: cargo test --workspace --all-targets
+
+      - name: Check rustdoc (no warnings)
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: cargo doc --no-deps -p agent-rules-tool --all-features
 
   rumdl:
     name: Markdown Hygiene

@@ -28,7 +28,7 @@ did not change. Do **not** add workflow-level `paths:` filters to required check
 
 | Job (required check name) | Runs when paths match… | Agent rule / command |
 |---------------------------|------------------------|----------------------|
-| `CI (ubuntu-latest)` / `CI (macos-latest)` | `**/*.rs`, `**/Cargo.toml`, `rust-toolchain.toml`, `.github/workflows/ci.yml`, `.agents/rules/**` | [`rust-quality.md`](rust-quality.md), [`agent-rules-lint.md`](agent-rules-lint.md) |
+| `CI (ubuntu-latest)` / `CI (macos-latest)` | `**/*.rs`, `**/Cargo.toml`, `rust-toolchain.toml`, `.github/workflows/ci.yml`, `.agents/rules/**` | [`rust-quality.md`](rust-quality.md), [`agent-rules-lint.md`](agent-rules-lint.md). Separate jobs (not a matrix) so skips match required check names. |
 | `Markdown Hygiene` | `**/*.md`, `.rumdl.toml` | [`markdown-quality.md`](markdown-quality.md) |
 | `Check Spec` | `spec/**`, `xtask/**`, `docs/maintenance.md` | [`docs/maintenance.md`](../../docs/maintenance.md) |
 
@@ -47,7 +47,7 @@ did not change. Do **not** add workflow-level `paths:` filters to required check
 | [`markdown-quality.md`](markdown-quality.md) rumdl command/config | `ci.yml` rumdl job |
 | [`rust-quality.md`](rust-quality.md) cargo commands or `paths` | `ci.yml` `rust` filter and rust job steps (fast-fail order; publish dry-run on ubuntu) |
 | [`agent-rules-lint.md`](agent-rules-lint.md) paths or lint command | `ci.yml` `rules` filter (runs the rust job for rule-only edits) |
-| [`release-plz.toml`](../../release-plz.toml) | [`release-plz.yml`](../../.github/workflows/release-plz.yml) |
+| [`release-plz.toml`](../../release-plz.toml) | [`release-plz.yml`](../../.github/workflows/release-plz.yml); `RELEASE_PLZ_TOKEN` secret (see [`docs/releases.md`](../../docs/releases.md)) |
 | [`release-plz/action`](../../.github/workflows/release-plz.yml) version bump | Transitive allowlist pins below (read `action.yml` for SHAs) |
 | [`xtask`](../../xtask/) spec-update or [`docs/maintenance.md`](../../docs/maintenance.md) | `ci.yml` `spec` filter and [`check-spec.yml`](../../.github/workflows/check-spec.yml) |
 | Any workflow file | Current action majors (`checkout@v6`, `paths-filter@v4`, `rumdl@v0`, etc.); commands aligned with agent rules |
