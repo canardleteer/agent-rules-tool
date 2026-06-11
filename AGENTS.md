@@ -83,6 +83,32 @@ Post-merge / maintainer workflows (not MR gates): [`check-spec.yml`](.github/wor
 (weekly drift), [`release-plz.yml`](.github/workflows/release-plz.yml) (releases).
 See [`.agents/rules/workflow-sync.md`](.agents/rules/workflow-sync.md) when editing CI.
 
+### New workflows and third-party actions
+
+This repository uses **Allow select actions** (not all of GitHub Marketplace).
+Do **not** add a workflow file, job, or new `uses:` action without following
+this process:
+
+1. **Confirm with the user** before you add or change anything under
+   `.github/workflows/`, or before you pin a third-party action not already
+   listed in [`.agents/rules/workflow-sync.md`](.agents/rules/workflow-sync.md).
+2. The **user must confirm with the project maintainer** before the change
+   lands. If the user is the maintainer, skip this step — but still follow
+   steps 3–4 and 5.
+3. **Verify the latest version**: check the upstream repo releases/tags (or
+   action major) and pick a current pin. Prefer Node 24–compatible actions
+   when GitHub warns about Node 20 deprecation.
+4. **Confirm it is safe to include**: pin a tag or full commit SHA (not
+   `@main`), use a trustworthy publisher, grant minimal job permissions, and
+   note any supply-chain or runtime concerns for the user.
+5. **Allowed actions list**: updating the repo allowlist (Settings → Actions →
+   **Allow select actions**, or `gh api …/selected-actions`) and the pattern
+   list in `workflow-sync.md` requires **explicit user approval even when the
+   user is the maintainer**. Agents must not change allowlist settings on their
+   own.
+
+Current allowed patterns live in [`workflow-sync.md`](.agents/rules/workflow-sync.md).
+
 For rule linting: if `cargo run` fails, alert the user that the dev path is
 broken; if the installed binary is also unavailable, alert the user that
 neither path works.
