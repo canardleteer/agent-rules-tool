@@ -100,7 +100,6 @@ jobs:
       needs.changes.outputs.rust == 'true' ||
       needs.changes.outputs.rules == 'true'
     runs-on: macos-latest
-    # - windows-latest  # enable when Windows support is ready
 
     steps:
       - uses: actions/checkout@v6
@@ -112,6 +111,42 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           shared-key: ci-macos-latest-all-features
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+      - name: Lint agent rules
+        run: cargo run --bin agent-rules-tool -- lint -d .agents/rules
+
+      - name: Run tests
+        run: cargo test --workspace --all-targets
+
+      - name: Check rustdoc (no warnings)
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: cargo doc --no-deps -p agent-rules-tool --all-features
+
+  rust-windows:
+    name: CI (windows-latest)
+    needs: changes
+    if: |
+      needs.changes.outputs.rust == 'true' ||
+      needs.changes.outputs.rules == 'true'
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry and build
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ci-windows-latest-all-features
 
       - name: Check formatting
         run: cargo fmt --all -- --check

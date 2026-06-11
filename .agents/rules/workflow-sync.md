@@ -28,7 +28,7 @@ did not change. Do **not** add workflow-level `paths:` filters to required check
 
 | Job (required check name) | Runs when paths match… | Agent rule / command |
 |---------------------------|------------------------|----------------------|
-| `CI (ubuntu-latest)` / `CI (macos-latest)` | `**/*.rs`, `**/Cargo.toml`, `rust-toolchain.toml`, `.github/workflows/ci.yml`, `.agents/rules/**` | [`rust-quality.md`](rust-quality.md), [`agent-rules-lint.md`](agent-rules-lint.md). Separate jobs (not a matrix) so skips match required check names. |
+| `CI (ubuntu-latest)` / `CI (macos-latest)` / `CI (windows-latest)` | `**/*.rs`, `**/Cargo.toml`, `rust-toolchain.toml`, `.github/workflows/ci.yml`, `.agents/rules/**` | [`rust-quality.md`](rust-quality.md), [`agent-rules-lint.md`](agent-rules-lint.md). Separate jobs (not a matrix) so skips match required check names. |
 | `Markdown Hygiene` | `**/*.md`, `.rumdl.toml` | [`markdown-quality.md`](markdown-quality.md) |
 | `Check Spec` | `spec/**`, `xtask/**`, `docs/maintenance.md` | [`docs/maintenance.md`](../../docs/maintenance.md) |
 
