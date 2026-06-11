@@ -14,20 +14,20 @@ jobs:
       contents: write
       pull-requests: read
     steps:
-      - &checkout
-        name: Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
-      - &install-rust
-        name: Install Rust toolchain
+
+      - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-      - &cache
-        name: Cache cargo registry and build
+
+      - name: Cache cargo registry and build
         uses: Swatinem/rust-cache@v2
         with:
           shared-key: release-plz
+
       - name: Run release-plz
         uses: release-plz/action@v0.5.128
         with:
@@ -47,9 +47,20 @@ jobs:
       group: release-plz-${{ github.ref }}
       cancel-in-progress: false
     steps:
-      - *checkout
-      - *install-rust
-      - *cache
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry and build
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: release-plz
+
       - name: Run release-plz
         uses: release-plz/action@v0.5.128
         with:
