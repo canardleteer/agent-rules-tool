@@ -23,3 +23,8 @@ cargo xtask spec-update check --ref main
 
 `fresh` and `update` update `spec/`, `spec/index.yaml`, and `src/spec.rs`
 (`SPEC_COMMIT`). See `spec/index.yaml` for the pinned upstream commit.
+
+On pull requests that touch `spec/`, `xtask/`, or `docs/maintenance.md`, the
+`Check Spec` job in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
+runs the same `check` command. [`.github/workflows/check-spec.yml`](../.github/workflows/check-spec.yml)
+also runs it weekly and on manual dispatch for upstream drift.

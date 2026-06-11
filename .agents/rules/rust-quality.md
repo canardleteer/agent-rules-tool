@@ -1,15 +1,16 @@
 ---
 name: rust-quality
-description: Run fmt, clippy, rule lint, tests, and rustdoc after Rust changes (fast fail)
+description: Run fmt, clippy, rule lint, tests, rustdoc, and publish dry-run after Rust or manifest changes (fast fail)
 trigger: auto
 paths:
   - "**/*.rs"
+  - "**/Cargo.toml"
 ---
 
 # Rust quality
 
-After any `.rs` change, run these commands from the repo root in order (fast
-fail — stop and fix at the first failure):
+After any `.rs` or `Cargo.toml` change, run these commands from the repo root
+in order (fast fail — stop and fix at the first failure):
 
 1. `cargo fmt --all` — apply formatting
 2. `cargo clippy --workspace --all-targets --all-features -- -D warnings`
@@ -22,5 +23,9 @@ fail — stop and fix at the first failure):
    or `#[ignore]` tests to get green; if stuck, ask the user for help
 5. `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps -p agent-rules-tool
    --all-features` — fix rustdoc warnings and errors
+6. `cargo publish -p agent-rules-tool --dry-run` — package/manifest consistency
+   check (does not upload; does not fail if the version is already on crates.io)
 
-This order matches [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
+This order matches the `CI (ubuntu-latest)` / `CI (macos-latest)` jobs in
+[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml). Those jobs run when
+Rust/manifest paths or `.agents/rules/**` change (job-level skip otherwise).

@@ -4,11 +4,17 @@ resolver = "2"
 
 [package]
 name = "agent-rules-tool"
-version = "0.1.0"
+version = "0.1.0-rc.1"
 edition = "2024"
 license = "MIT"
 description = "Lint and migrate agent rules per agent-rules-spec"
 readme = "README.md"
+authors = ["canardleteer"]
+repository = "https://github.com/canardleteer/agent-rules-tool"
+homepage = "https://github.com/canardleteer/agent-rules-tool"
+documentation = "https://docs.rs/agent-rules-tool"
+keywords = ["agent", "rules", "lint", "ai", "cursor"]
+categories = ["command-line-utilities", "development-tools"]
 
 [lib]
 name = "agent_rules_tool"

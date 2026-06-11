@@ -41,3 +41,6 @@ Do not skip linting or ignore spec violations to get green.
 
 When you also changed `**/*.rs`, step 2 is already covered by
 [`rust-quality.md`](rust-quality.md) (after fmt and clippy).
+
+CI runs the rust jobs when `.agents/rules/**` changes even without `.rs` edits
+(see [`workflow-sync.md`](workflow-sync.md)).

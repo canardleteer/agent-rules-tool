@@ -15,3 +15,7 @@ After any `.md` change:
 
 Vendored upstream files under `spec/` are excluded in [`.rumdl.toml`](../../.rumdl.toml)
 and are not checked by rumdl.
+
+CI runs the `Markdown Hygiene` job in
+[`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) when `**/*.md` or
+`.rumdl.toml` changes (job-level skip otherwise; safe as a required check).

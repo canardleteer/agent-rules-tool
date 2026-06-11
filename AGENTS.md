@@ -37,6 +37,22 @@ upstream revision and vendored file manifest.
 * Do not overwrite output files without `--force`.
 * Refresh vendored spec: see [docs/maintenance.md](docs/maintenance.md).
 
+## Documentation (`docs/`)
+
+Long-form guides live under [`docs/`](docs/). This list will grow — after any
+change, **check whether an existing doc covers the topic** and update it when
+behavior, commands, or maintainer workflow changed.
+
+| Doc | Topics covered — review when you change… |
+|-----|------------------------------------------|
+| [`maintenance.md`](docs/maintenance.md) | Vendored `spec/`, `cargo xtask spec-update`, `check-spec` workflow |
+| [`releases.md`](docs/releases.md) | release-plz, crates.io publishing, release workflow on `main` |
+| [`third-party-specs.md`](docs/third-party-specs.md) | External agent rule formats, migration sources, doc links |
+
+When adding a new concern that maintainers or contributors need to read later,
+prefer a new `docs/<topic>.md` (and link it here) over duplicating detail in
+`AGENTS.md` or the README.
+
 ## Agent rules
 
 Structured rules for this repo live in [`.agents/rules/`](.agents/rules/).
@@ -51,7 +67,52 @@ does not natively load [agent-rules-spec](https://github.com/rameshsunkara/agent
 | `agent-rules-lint` | `.agents/rules/**` changes | rumdl → `cargo run … lint` (see rule for fallback) |
 | `workflow-sync` | CI/config paths (see rule) | keep `.github/workflows/` aligned with quality rules and `.rumdl.toml` |
 
-CI workflows live under [`.github/workflows/`](.github/workflows/).
+## CI
+
+Pull-request gates live in [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+path-aware jobs (via `dorny/paths-filter`) share one workflow so skipped jobs
+still satisfy required checks. Required status check names on `main`:
+
+* `CI (ubuntu-latest)` — Rust fmt, clippy, rule lint, tests, rustdoc, publish
+  dry-run, audit
+* `CI (macos-latest)` — same Rust pipeline on macOS
+* `Markdown Hygiene` — rumdl when `**/*.md` or `.rumdl.toml` changes
+* `Check Spec` — `cargo xtask spec-update check` when vendored spec paths change
+
+Post-merge / maintainer workflows (not MR gates): [`check-spec.yml`](.github/workflows/check-spec.yml)
+(weekly drift), [`release-plz.yml`](.github/workflows/release-plz.yml) (releases).
+See [`.agents/rules/workflow-sync.md`](.agents/rules/workflow-sync.md) when editing CI.
+
+### New workflows and third-party actions
+
+This repository uses **Allow select actions** (not all of GitHub Marketplace).
+Do **not** add a workflow file, job, or new `uses:` action without following
+this process:
+
+1. **Confirm with the user** before you add or change anything under
+   `.github/workflows/`, or before you pin a third-party action not already
+   listed in [`.agents/rules/workflow-sync.md`](.agents/rules/workflow-sync.md).
+2. The **user must confirm with the project maintainer** before the change
+   lands. If the user is the maintainer, skip this step — but still follow
+   steps 3–4 and 5.
+3. **Verify the latest version**: check the upstream repo releases/tags (or
+   action major) and pick a current pin. Prefer Node 24–compatible actions
+   when GitHub warns about Node 20 deprecation.
+4. **Confirm it is safe to include**: pin a tag or full commit SHA (not
+   `@main`), use a trustworthy publisher, grant minimal job permissions, and
+   note any supply-chain or runtime concerns for the user.
+5. **Allowed actions list**: updating the repo allowlist (Settings → Actions →
+   **Allow select actions**, or `gh api …/selected-actions`) and the pattern
+   list in `workflow-sync.md` requires **explicit user approval even when the
+   user is the maintainer**. Agents must not change allowlist settings on their
+   own.
+
+   **Not implicit approval:** a user report that CI or release workflows are
+   failing, asking you to debug, or saying "fix it" does **not** authorize
+   allowlist or workflow changes. Stop after diagnosis, propose the exact pins
+   or workflow edits, and wait for an explicit yes before applying them.
+
+Current allowed patterns live in [`workflow-sync.md`](.agents/rules/workflow-sync.md).
 
 For rule linting: if `cargo run` fails, alert the user that the dev path is
 broken; if the installed binary is also unavailable, alert the user that
