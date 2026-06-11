@@ -9,7 +9,9 @@ to `main`.
    `Cargo.toml`, `CHANGELOG.md`).
 2. Merge that PR when you are ready to ship.
 3. **`release-plz-release`** publishes to [crates.io](https://crates.io/crates/agent-rules-tool)
-   and creates a GitHub Release/tag.
+   and creates a GitHub Release/tag. With `release_always = false` in
+   [`release-plz.toml`](../release-plz.toml), publish runs only when that
+   Release PR merges—not on every push to `main`.
 
 Use [conventional commits](https://www.conventionalcommits.org/) on `main` so
 release-plz picks the right semver bump (`feat:` minor, `fix:` patch,

@@ -2,7 +2,9 @@
 repo_url = "https://github.com/canardleteer/agent-rules-tool"
 pr_labels = ["release"]
 semver_check = true
+release_always = false
 
 [[package]]
 name = "xtask"
 release = false
+publish = false
