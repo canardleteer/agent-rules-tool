@@ -25,6 +25,9 @@ gh secret set RELEASE_PLZ_TOKEN --repo canardleteer/agent-rules-tool
    and creates a GitHub Release/tag. With `release_always = false` in
    [`release-plz.toml`](../release-plz.toml), publish runs only when that
    Release PR merges—not on every push to `main`.
+4. **`cd.yml`** runs on `release: published`, builds pre-built CLI binaries per
+   [release-plz binary-release docs](https://release-plz.dev/docs/extra/releasing-binaries),
+   and uploads them as GitHub Release assets.
 
 Use [conventional commits](https://www.conventionalcommits.org/) on `main` so
 release-plz picks the right semver bump (`feat:` minor, `fix:` patch,

@@ -38,6 +38,7 @@ did not change. Do **not** add workflow-level `paths:` filters to required check
 |----------|---------|---------|
 | [`check-spec.yml`](../../.github/workflows/check-spec.yml) | Weekly cron, `workflow_dispatch` | Upstream drift alarm (same command as the PR job) |
 | [`release-plz.yml`](../../.github/workflows/release-plz.yml) | Push to `main` | Release PRs and crates.io publishing |
+| [`cd.yml`](../../.github/workflows/cd.yml) | `release: published` | Build and upload release binaries (see [releases.md](../../docs/releases.md)) |
 
 ## Sync checklist
 
@@ -67,6 +68,12 @@ without explicit user approval** — debugging a failure does not count; see
   (transitive via release-plz)
 * `taiki-e/install-action@f23382d582832e41d5eb4fff2bddb06bc5adf8d3`
   (transitive via release-plz)
+* `taiki-e/install-action@56545b37b57562edd73171cb6c62cc509db4c34e`
+  (cd.yml `cross` for musl targets)
+* `taiki-e/setup-cross-toolchain-action@3d9770ce98eb7dbcf378563182a5e8031165f75b`
+  (cd.yml cross gnu targets)
+* `taiki-e/upload-rust-binary-action@f0d45ae91ee7b8ee928de7a9d04d893a08bcbec6`
+  (cd.yml release assets)
 * `cargo-bins/cargo-binstall@1800853f2578f8c34492ec76154caef8e163fbca`
   (transitive via release-plz)
 * `rvben/rumdl@v0`
