@@ -50,9 +50,10 @@ did not change. Do **not** add workflow-level `paths:` filters to required check
 | [`release-plz.toml`](../../release-plz.toml) | [`release-plz.yml`](../../.github/workflows/release-plz.yml) |
 | [`xtask`](../../xtask/) spec-update or [`docs/maintenance.md`](../../docs/maintenance.md) | `ci.yml` `spec` filter and [`check-spec.yml`](../../.github/workflows/check-spec.yml) |
 | Any workflow file | Current action majors (`checkout@v6`, `paths-filter@v4`, `rumdl@v0`, etc.); commands aligned with agent rules |
-| New third-party action in a workflow | Repository **Settings → Actions → Allow select actions** (or `gh api …/selected-actions`); keep pins in sync with `ci.yml` / `release-plz.yml` |
+| New workflow file, new `uses:` action, or allowlist change | See [AGENTS.md § New workflows and third-party actions](../../AGENTS.md#new-workflows-and-third-party-actions): confirm with user → maintainer; verify latest safe pin; **never** update allowlist without explicit user approval |
 
-Allowed action patterns (repo policy: select actions only):
+Allowed action patterns (repo policy: select actions only; **do not extend without
+user approval** — see [AGENTS.md](../../AGENTS.md#new-workflows-and-third-party-actions)):
 
 * `actions/checkout@v6`
 * `dtolnay/rust-toolchain@stable`
