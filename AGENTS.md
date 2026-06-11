@@ -37,6 +37,44 @@ upstream revision and vendored file manifest.
 * Do not overwrite output files without `--force`.
 * Refresh vendored spec: see [docs/maintenance.md](docs/maintenance.md).
 
+## Git workflow
+
+Keep feature branches a **linear extension** of `main`. Divergence is usually
+parallel commits with the same content, not different file edits.
+
+### Starting work
+
+```bash
+git fetch origin
+git switch -c <branch> origin/main
+```
+
+Always branch from `origin/main`, not a stale local `main`.
+
+**Syncing with `main`**
+
+* Prefer **`git rebase origin/main`** (or reset to `origin/main` and
+  cherry-pick feature commits).
+* Do **not** `git merge origin/main` on a feature branch unless the user
+  explicitly asks for a merge commit.
+
+### Before push
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+### Diagnose graph vs content drift
+
+```bash
+git log --oneline origin/main..HEAD   # commits only on your branch
+git diff origin/main...HEAD           # actual file changes
+```
+
+Many commits with a small diff means the branch forked or re-did work already
+on `main` — rebase or cherry-pick instead of merging.
+
 ## Documentation (`docs/`)
 
 Long-form guides live under [`docs/`](docs/). This list will grow — after any
