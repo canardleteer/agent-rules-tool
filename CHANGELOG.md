@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-rc.2](https://github.com/canardleteer/agent-rules-tool/compare/v0.1.0-rc.1...v0.1.0-rc.2) - 2026-06-11
+
+### Added
+
+- add lint_and_migrate library example
+
+### Other
+
+- agent git workflow for staying aligned with main
+- add Windows release binaries to cd.yml
+- enable Windows Rust CI
+- upload release binaries (non-Windows targets)
+- install instructions for 0.1 RC line
+
 ## [0.1.0-rc.1](https://github.com/canardleteer/agent-rules-tool/releases/tag/v0.1.0-rc.1) - 2026-06-11
 
 ### Added
