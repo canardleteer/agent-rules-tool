@@ -50,6 +50,17 @@ did not change. Do **not** add workflow-level `paths:` filters to required check
 | [`release-plz.toml`](../../release-plz.toml) | [`release-plz.yml`](../../.github/workflows/release-plz.yml) |
 | [`xtask`](../../xtask/) spec-update or [`docs/maintenance.md`](../../docs/maintenance.md) | `ci.yml` `spec` filter and [`check-spec.yml`](../../.github/workflows/check-spec.yml) |
 | Any workflow file | Current action majors (`checkout@v6`, `rumdl@v0`, etc.); commands aligned with agent rules |
+| New third-party action in a workflow | Repository **Settings → Actions → Allow select actions** (or `gh api …/selected-actions`); keep pins in sync with `ci.yml` / `release-plz.yml` |
+
+Allowed action patterns (repo policy: select actions only):
+
+* `actions/checkout@v6`
+* `dtolnay/rust-toolchain@stable`
+* `Swatinem/rust-cache@v2`
+* `dorny/paths-filter@v3`
+* `rustsec/audit-check@858dc40f52ca2b8570b7a997c1c4e35c6fc9a432`
+* `release-plz/action@v0.5.128`
+* `rvben/rumdl@v0`
 
 After editing rule or workflow files, run `rumdl check .` and
 `cargo run --bin agent-rules-tool -- lint -d .agents/rules`.
