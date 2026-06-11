@@ -81,6 +81,8 @@ still satisfy required checks. Required status check names on `main`:
 * `CI (ubuntu-latest)` — Rust fmt, clippy, rule lint, tests, rustdoc, publish
   dry-run, audit
 * `CI (macos-latest)` — same Rust pipeline on macOS
+* `CI (windows-latest)` — same Rust pipeline on Windows (required; we ship
+  Windows release binaries)
 * `Markdown Hygiene` — rumdl when `**/*.md` or `.rumdl.toml` changes
 * `Check Spec` — `cargo xtask spec-update check` when vendored spec paths change
 
