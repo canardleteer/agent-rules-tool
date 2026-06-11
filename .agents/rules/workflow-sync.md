@@ -9,8 +9,9 @@ paths:
   - ".agents/rules/markdown-quality.md"
   - "xtask/**"
   - "docs/maintenance.md"
-  - "Cargo.toml"
+  - "**/Cargo.toml"
   - "rust-toolchain.toml"
+  - "release-plz.toml"
 ---
 
 # Workflow sync
@@ -22,7 +23,8 @@ When changing files that affect CI, keep workflows and agent rules aligned.
 | [`.rumdl.toml`](../../.rumdl.toml) `include` | [`.github/workflows/rumdl.yml`](../../.github/workflows/rumdl.yml) `paths` filters |
 | [`.rumdl.toml`](../../.rumdl.toml) `exclude` | Keep vendored `spec/` out of rumdl (upstream examples, not repo-owned docs) |
 | [`markdown-quality.md`](markdown-quality.md) rumdl command/config | `rumdl.yml` action config |
-| [`rust-quality.md`](rust-quality.md) cargo commands | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) steps (same fast-fail order) |
+| [`rust-quality.md`](rust-quality.md) cargo commands or `paths` (`**/*.rs`, `**/Cargo.toml`) | [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) steps (same fast-fail order, ending with `cargo publish -p agent-rules-tool --dry-run` on ubuntu) |
+| [`release-plz.toml`](../../release-plz.toml) | [`.github/workflows/release-plz.yml`](../../.github/workflows/release-plz.yml) (checkout, toolchain, action version, env) |
 | [`xtask`](../../xtask/) spec-update behavior or [`docs/maintenance.md`](../../docs/maintenance.md) | [`.github/workflows/check-spec.yml`](../../.github/workflows/check-spec.yml) |
 | Any workflow file | Use current action majors (`checkout@v6`, `rumdl@v0`, etc.); keep commands aligned with agent rules |
 

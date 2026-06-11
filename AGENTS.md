@@ -37,6 +37,22 @@ upstream revision and vendored file manifest.
 * Do not overwrite output files without `--force`.
 * Refresh vendored spec: see [docs/maintenance.md](docs/maintenance.md).
 
+## Documentation (`docs/`)
+
+Long-form guides live under [`docs/`](docs/). This list will grow — after any
+change, **check whether an existing doc covers the topic** and update it when
+behavior, commands, or maintainer workflow changed.
+
+| Doc | Topics covered — review when you change… |
+|-----|------------------------------------------|
+| [`maintenance.md`](docs/maintenance.md) | Vendored `spec/`, `cargo xtask spec-update`, `check-spec` workflow |
+| [`releases.md`](docs/releases.md) | release-plz, crates.io publishing, release workflow on `main` |
+| [`third-party-specs.md`](docs/third-party-specs.md) | External agent rule formats, migration sources, doc links |
+
+When adding a new concern that maintainers or contributors need to read later,
+prefer a new `docs/<topic>.md` (and link it here) over duplicating detail in
+`AGENTS.md` or the README.
+
 ## Agent rules
 
 Structured rules for this repo live in [`.agents/rules/`](.agents/rules/).
