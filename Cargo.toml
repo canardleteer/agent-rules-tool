@@ -13,7 +13,7 @@ authors = ["canardleteer"]
 repository = "https://github.com/canardleteer/agent-rules-tool"
 homepage = "https://github.com/canardleteer/agent-rules-tool"
 documentation = "https://docs.rs/agent-rules-tool"
-keywords = ["agent", "rules", "lint", "ai", "cursor"]
+keywords = ["agent", "rules", "lint", "ai"]
 categories = ["command-line-utilities", "development-tools"]
 
 [lib]

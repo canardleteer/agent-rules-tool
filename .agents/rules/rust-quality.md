@@ -5,6 +5,7 @@ trigger: auto
 paths:
   - "**/*.rs"
   - "**/Cargo.toml"
+  - "examples/**"
 ---
 
 # Rust quality
@@ -14,8 +15,8 @@ in order (fast fail — stop and fix at the first failure):
 
 1. `cargo fmt --all` — apply formatting
 2. `cargo clippy --workspace --all-targets --all-features -- -D warnings`
-   — fix all warnings and errors; do not add `allow` attributes unless the user
-   explicitly asks
+   — fix all warnings and errors; includes `examples/`; do not add `allow`
+   attributes unless the user explicitly asks
 3. `cargo run --bin agent-rules-tool -- lint -d .agents/rules` — fix spec
    violations in [`.agents/rules/`](../../.agents/rules/); if `cargo run` fails,
    follow the fallback and user-alert steps in [`agent-rules-lint.md`](agent-rules-lint.md)

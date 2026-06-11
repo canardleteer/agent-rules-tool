@@ -34,6 +34,7 @@ jobs:
             rust:
               - '**/*.rs'
               - '**/Cargo.toml'
+              - 'examples/**'
               - 'rust-toolchain.toml'
               - '.github/workflows/ci.yml'
             rules:
