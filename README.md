@@ -75,6 +75,12 @@ overwritten unless `--force` is set.
 Native rule formats and documentation links for each supported agent. See
 [docs/third-party-specs.md](docs/third-party-specs.md).
 
+## Releases
+
+Published to [crates.io/crates/agent-rules-tool](https://crates.io/crates/agent-rules-tool)
+via [release-plz](https://release-plz.dev/) on merge to `main`. See
+[docs/releases.md](docs/releases.md) for the release workflow.
+
 ## Maintaining vendored spec
 
 See [docs/maintenance.md](docs/maintenance.md).

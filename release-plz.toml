@@ -1,0 +1,8 @@
+[workspace]
+repo_url = "https://github.com/canardleteer/agent-rules-tool"
+pr_labels = ["release"]
+semver_check = true
+
+[[package]]
+name = "xtask"
+release = false
