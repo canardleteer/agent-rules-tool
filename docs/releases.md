@@ -3,6 +3,19 @@
 Releases are automated with [release-plz](https://release-plz.dev/) on every push
 to `main`.
 
+## Repository secrets
+
+| Secret | Purpose |
+|--------|---------|
+| `RELEASE_PLZ_TOKEN` | Classic PAT with `repo` scope. Passed to release-plz as `GITHUB_TOKEN` so [Release PRs trigger CI](https://release-plz.dev/docs/github/token). The default Actions token cannot start check workflows on bot-opened PRs. |
+| `CARGO_REGISTRY_TOKEN` | crates.io API token for `cargo publish`. |
+
+Create a classic PAT under GitHub → Settings → Developer settings, then:
+
+```bash
+gh secret set RELEASE_PLZ_TOKEN --repo canardleteer/agent-rules-tool
+```
+
 ## How it works
 
 1. **`release-plz-pr`** opens or updates a Release PR (version bump in
