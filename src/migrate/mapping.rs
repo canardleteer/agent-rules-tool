@@ -11,6 +11,7 @@ const AGENTS_KEYS: &[&str] = &[
     "trigger",
     "paths",
     "keywords",
+    "discovery",
     "priority",
     "tags",
 ];
@@ -103,11 +104,13 @@ fn inbound_to_agents_warnings(
     match source {
         RuleFormat::Cursor => {
             let has_globs = src.contains_key("globs");
-            let has_always_apply = src.contains_key("alwaysApply");
-            if !has_globs && !has_always_apply && src.contains_key("description") {
+            let always_apply = src.get("alwaysApply").and_then(|v| v.as_bool());
+            if !has_globs && always_apply != Some(true) && src.contains_key("description") {
                 warnings.push(MigrateWarning {
                     field: Some("description".to_string()),
-                    message: "Cursor agent-requested mode maps to trigger: auto without paths or keywords; activation may differ".to_string(),
+                    message:
+                        "Cursor Apply Intelligently maps to trigger: auto with discovery: true"
+                            .to_string(),
                 });
             }
         }
@@ -116,7 +119,8 @@ fn inbound_to_agents_warnings(
         {
             warnings.push(MigrateWarning {
                 field: Some("trigger".to_string()),
-                message: "Windsurf model_decision has no direct agents equivalent; mapped to trigger: auto".to_string(),
+                message: "Windsurf model_decision maps to trigger: auto with discovery: true"
+                    .to_string(),
             });
         }
         RuleFormat::Copilot => {
@@ -128,6 +132,23 @@ fn inbound_to_agents_warnings(
                     message: "Copilot applyTo comma-separated globs were split into paths array; verify patterns".to_string(),
                 });
             }
+            if !src.contains_key("applyTo") && src.contains_key("description") {
+                warnings.push(MigrateWarning {
+                    field: Some("description".to_string()),
+                    message:
+                        "Copilot on-demand instruction maps to trigger: auto with discovery: true"
+                            .to_string(),
+                });
+            }
+        }
+        RuleFormat::Jetbrains
+            if src.get("trigger").and_then(|v| v.as_str()) == Some("model_decision") =>
+        {
+            warnings.push(MigrateWarning {
+                field: Some("trigger".to_string()),
+                message: "JetBrains By model decision maps to trigger: auto with discovery: true"
+                    .to_string(),
+            });
         }
         RuleFormat::Claude | RuleFormat::Cline
             if agents.get("trigger").and_then(|v| v.as_str()) == Some("manual") =>
@@ -184,6 +205,17 @@ fn outbound_from_agents_warnings(
     };
 
     for key in agents.keys() {
+        if key == "discovery"
+            && matches!(
+                target,
+                RuleFormat::Cursor
+                    | RuleFormat::Windsurf
+                    | RuleFormat::Copilot
+                    | RuleFormat::Jetbrains
+            )
+        {
+            continue;
+        }
         if !allowed.contains(&key.as_str()) {
             warnings.push(MigrateWarning {
                 field: Some(key.clone()),
@@ -207,7 +239,23 @@ fn outbound_from_agents_warnings(
         }
     }
 
-    if target == RuleFormat::Cursor
+    if agents.get("discovery").and_then(|v| v.as_bool()) == Some(true) {
+        let native = match target {
+            RuleFormat::Cursor => Some("Cursor Apply Intelligently"),
+            RuleFormat::Windsurf => Some("Windsurf trigger: model_decision"),
+            RuleFormat::Copilot => Some("Copilot on-demand instruction"),
+            RuleFormat::Jetbrains => Some("JetBrains By model decision"),
+            _ => None,
+        };
+        if let Some(native) = native {
+            warnings.push(MigrateWarning {
+                field: Some("discovery".to_string()),
+                message: format!(
+                    "discovery: true exported as {native}; advisory paths/keywords are omitted"
+                ),
+            });
+        }
+    } else if target == RuleFormat::Cursor
         && trigger == "auto"
         && !agents.contains_key("paths")
         && !agents.contains_key("keywords")

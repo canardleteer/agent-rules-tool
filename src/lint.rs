@@ -3,7 +3,7 @@
 use crate::error::Error;
 use crate::parse::{is_empty_frontmatter, parse_rule};
 use crate::schema::validate_frontmatter;
-use crate::spec::{RFC_FILE_CONVENTIONS, RFC_TRIGGER_MODES};
+use crate::spec::{RFC_DISCOVERY, RFC_FILE_CONVENTIONS, RFC_TRIGGER_MODES};
 use crate::{FileLintResult, LintOptions, LintReport, Severity, Violation};
 use serde_json::Value;
 use std::path::Path;
@@ -11,8 +11,9 @@ use std::path::Path;
 /// Lint one rule file's markdown content (frontmatter + body).
 ///
 /// Validates frontmatter against the embedded schema and applies semantic checks
-/// such as `name` vs filename stem and `trigger: auto` requiring `paths` or
-/// `keywords`.
+/// such as `name` vs filename stem, `discovery: true` draft warnings, and
+/// `trigger: auto` requiring `paths` or `keywords` unless the rule is in
+/// discovery mode.
 ///
 /// # Examples
 ///
@@ -101,6 +102,21 @@ fn semantic_checks(frontmatter: &Value, filename_hint: Option<&str>) -> Vec<Viol
         });
     }
 
+    let discovery = frontmatter
+        .get("discovery")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+
+    if discovery {
+        violations.push(Violation {
+            severity: Severity::Warn,
+            field: "discovery".to_string(),
+            message: "discovery: true marks this rule as a draft seeking agentic guidance"
+                .to_string(),
+            spec_ref: RFC_DISCOVERY,
+        });
+    }
+
     if let Some(trigger) = frontmatter.get("trigger").and_then(|v| v.as_str())
         && trigger == "auto"
     {
@@ -113,12 +129,22 @@ fn semantic_checks(frontmatter: &Value, filename_hint: Option<&str>) -> Vec<Viol
             .and_then(|v| v.as_array())
             .is_some_and(|a| !a.is_empty());
         if !has_paths && !has_keywords {
-            violations.push(Violation {
-                severity: Severity::Error,
-                field: "trigger".to_string(),
-                message: "when trigger is 'auto', paths or keywords is required".to_string(),
-                spec_ref: RFC_TRIGGER_MODES,
-            });
+            if discovery {
+                violations.push(Violation {
+                    severity: Severity::Warn,
+                    field: "trigger".to_string(),
+                    message: "discovery draft with trigger: auto has no binding paths or keywords"
+                        .to_string(),
+                    spec_ref: RFC_DISCOVERY,
+                });
+            } else {
+                violations.push(Violation {
+                    severity: Severity::Error,
+                    field: "trigger".to_string(),
+                    message: "when trigger is 'auto', paths or keywords is required".to_string(),
+                    spec_ref: RFC_TRIGGER_MODES,
+                });
+            }
         }
     }
 

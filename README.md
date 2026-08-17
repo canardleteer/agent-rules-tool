@@ -58,6 +58,9 @@ agent-rules-tool lint --severity warn --report report.yaml
 * `--severity warn`: exit `1` on warnings or errors
 * `--report`: write a YAML report (aggregate for directory mode,
   single-file for `-i`)
+* `discovery: true` is valid schema; lint emits a warning (draft seeking
+  agentic guidance). Missing `paths`/`keywords` on `trigger: auto` is a
+  warning in discovery mode and an error once the rule is finalized.
 
 ### Migrate
 
@@ -74,7 +77,10 @@ agent-rules-tool migrate auto --force
 
 Unknown frontmatter keys error with a link to file an issue on
 [agent-rules-spec](https://github.com/rameshsunkara/agent-rules-spec/issues).
-Lossy or ambiguous field mappings emit warnings.
+Lossy or ambiguous field mappings emit warnings. Native model-judgment
+modes (Cursor Apply Intelligently, Windsurf `model_decision`, Copilot
+on-demand, JetBrains By model decision) import as `trigger: auto` with
+`discovery: true`, and export back to that native shape.
 
 * `<type>`: source format (`agents`, `cursor`, `windsurf`, `copilot`,
   `cline`, `claude`, `jetbrains`, `amazonq`, or `auto`)

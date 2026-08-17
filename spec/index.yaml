@@ -1,5 +1,5 @@
 repository: https://github.com/rameshsunkara/agent-rules-spec
-commit: f23a86b4df8f2455e121cea88ce0d48a73a8f990
+commit: c6ce40263a369a3fbf8cb0742a9f38c95d16c195
 files:
 - vendored: agent-rule.schema.json
   upstream: schema/agent-rule.schema.json
@@ -7,5 +7,7 @@ files:
   upstream: examples/api-conventions.md
 - vendored: examples/code-style.md
   upstream: examples/code-style.md
+- vendored: examples/discovery-exploration.md
+  upstream: examples/discovery-exploration.md
 - vendored: examples/testing.md
   upstream: examples/testing.md

@@ -4,7 +4,7 @@
 /// Upstream specification repository URL.
 pub const SPEC_REPO: &str = "https://github.com/rameshsunkara/agent-rules-spec";
 /// Compile-time mirror of `commit` in [`spec/index.yaml`](../spec/index.yaml).
-pub const SPEC_COMMIT: &str = "f23a86b4df8f2455e121cea88ce0d48a73a8f990";
+pub const SPEC_COMMIT: &str = "c6ce40263a369a3fbf8cb0742a9f38c95d16c195";
 /// Relative path to the JSON Schema within the upstream repository.
 pub const SCHEMA_PATH: &str = "schema/agent-rule.schema.json";
 /// Canonical URL for the agent rule JSON Schema document.
@@ -16,6 +16,8 @@ pub const RFC_FRONTMATTER_FIELDS: &str =
 /// RFC section on trigger modes (`always`, `auto`, `manual`).
 pub const RFC_TRIGGER_MODES: &str =
     "https://github.com/rameshsunkara/agent-rules-spec/blob/main/RFC.md#trigger-modes";
+/// RFC section on discovery mode (`discovery: true` draft rules).
+pub const RFC_DISCOVERY: &str = "https://github.com/rameshsunkara/agent-rules-spec/blob/main/RFC.md#discovery-mode-a-draft-seeking-agentic-guidance";
 /// RFC section on file naming and layout conventions.
 pub const RFC_FILE_CONVENTIONS: &str =
     "https://github.com/rameshsunkara/agent-rules-spec/blob/main/RFC.md#file-conventions";
