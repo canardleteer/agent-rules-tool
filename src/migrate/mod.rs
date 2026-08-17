@@ -255,6 +255,9 @@ fn convert_cursor_to_agents(
         "always"
     } else if src.contains_key("globs") {
         "auto"
+    } else if src.contains_key("description") {
+        dst.insert("discovery".to_string(), json!(true));
+        "auto"
     } else {
         "manual"
     };
@@ -275,7 +278,10 @@ fn convert_windsurf_to_agents(
         Some("always_on") => "always",
         Some("glob") => "auto",
         Some("manual") => "manual",
-        Some("model_decision") => "auto",
+        Some("model_decision") => {
+            dst.insert("discovery".to_string(), json!(true));
+            "auto"
+        }
         _ if src.contains_key("globs") => "auto",
         _ => "always",
     };
@@ -301,6 +307,9 @@ fn convert_copilot_to_agents(
         };
         dst.insert("paths".to_string(), paths);
         dst.insert("trigger".to_string(), json!("auto"));
+    } else if src.contains_key("description") {
+        dst.insert("trigger".to_string(), json!("auto"));
+        dst.insert("discovery".to_string(), json!(true));
     } else {
         dst.insert("trigger".to_string(), json!("always"));
     }
@@ -335,7 +344,11 @@ fn convert_jetbrains_to_agents(
     } else if let Some(trigger) = src.get("trigger").and_then(|v| v.as_str()) {
         let mapped = match trigger {
             "always" | "always_on" => "always",
-            "auto" | "glob" | "model_decision" => "auto",
+            "auto" | "glob" => "auto",
+            "model_decision" => {
+                dst.insert("discovery".to_string(), json!(true));
+                "auto"
+            }
             "manual" => "manual",
             other => other,
         };
@@ -372,44 +385,53 @@ fn from_agents(
         }
         RuleFormat::Cursor => {
             copy_field(agents, &mut out, "description");
-            if let Some(paths) = agents.get("paths") {
-                out.insert("globs".to_string(), paths.clone());
-            }
-            let trigger = agents
-                .get("trigger")
-                .and_then(|v| v.as_str())
-                .unwrap_or("always");
-            match trigger {
-                "always" => {
-                    out.insert("alwaysApply".to_string(), json!(true));
+            if !is_discovery(agents) {
+                if let Some(paths) = agents.get("paths") {
+                    out.insert("globs".to_string(), paths.clone());
                 }
-                "auto" => {
-                    out.insert("alwaysApply".to_string(), json!(false));
+                let trigger = agents
+                    .get("trigger")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("always");
+                match trigger {
+                    "always" => {
+                        out.insert("alwaysApply".to_string(), json!(true));
+                    }
+                    "auto" => {
+                        out.insert("alwaysApply".to_string(), json!(false));
+                    }
+                    "manual" => {}
+                    _ => {}
                 }
-                "manual" => {}
-                _ => {}
             }
         }
         RuleFormat::Windsurf => {
             copy_field(agents, &mut out, "description");
-            if let Some(paths) = agents.get("paths") {
+            let discovery = is_discovery(agents);
+            if !discovery && let Some(paths) = agents.get("paths") {
                 out.insert("globs".to_string(), paths.clone());
             }
             let trigger = agents
                 .get("trigger")
                 .and_then(|v| v.as_str())
                 .unwrap_or("always");
-            let ws_trigger = match trigger {
-                "always" => "always_on",
-                "auto" => "glob",
-                "manual" => "manual",
-                _ => "always_on",
+            let ws_trigger = if discovery {
+                "model_decision"
+            } else {
+                match trigger {
+                    "always" => "always_on",
+                    "auto" => "glob",
+                    "manual" => "manual",
+                    _ => "always_on",
+                }
             };
             out.insert("trigger".to_string(), json!(ws_trigger));
         }
         RuleFormat::Copilot => {
             copy_field(agents, &mut out, "description");
-            if let Some(paths) = agents.get("paths").and_then(|v| v.as_array()) {
+            if !is_discovery(agents)
+                && let Some(paths) = agents.get("paths").and_then(|v| v.as_array())
+            {
                 let joined: Vec<&str> = paths.iter().filter_map(|p| p.as_str()).collect();
                 if !joined.is_empty() {
                     out.insert("applyTo".to_string(), json!(joined.join(",")));
@@ -421,7 +443,16 @@ fn from_agents(
                 out.insert("paths".to_string(), paths.clone());
             }
         }
-        RuleFormat::Jetbrains | RuleFormat::AmazonQ => {
+        RuleFormat::Jetbrains => {
+            copy_field(agents, &mut out, "description");
+            copy_field(agents, &mut out, "name");
+            if is_discovery(agents) {
+                out.insert("trigger".to_string(), json!("model_decision"));
+            } else if let Some(paths) = agents.get("paths") {
+                out.insert("paths".to_string(), paths.clone());
+            }
+        }
+        RuleFormat::AmazonQ => {
             copy_field(agents, &mut out, "description");
             copy_field(agents, &mut out, "name");
             if let Some(paths) = agents.get("paths") {
@@ -431,6 +462,10 @@ fn from_agents(
     }
 
     Ok(out)
+}
+
+fn is_discovery(agents: &Map<String, Value>) -> bool {
+    agents.get("discovery").and_then(|v| v.as_bool()) == Some(true)
 }
 
 fn copy_field(src: &Map<String, Value>, dst: &mut Map<String, Value>, field: &str) {

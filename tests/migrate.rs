@@ -227,12 +227,105 @@ globs:
         ..Default::default()
     };
     let result = migrate_string(content, &options).expect("migrate");
+    assert!(result.content.contains("trigger: auto"));
+    assert!(result.content.contains("discovery: true"));
     assert!(
         result
             .warnings
             .iter()
             .any(|w| w.message.contains("model_decision"))
     );
+}
+
+#[test]
+fn migrate_cursor_apply_intelligently_sets_discovery() {
+    let content = r#"---
+description: Use when writing GraphQL resolvers
+---
+body
+"#;
+    let options = MigrateOptions {
+        from: RuleFormat::Cursor,
+        to: RuleFormat::Agents,
+        filename_hint: Some("graphql-patterns".to_string()),
+        ..Default::default()
+    };
+    let result = migrate_string(content, &options).expect("migrate");
+    assert!(result.content.contains("trigger: auto"));
+    assert!(result.content.contains("discovery: true"));
+    assert!(
+        result
+            .warnings
+            .iter()
+            .any(|w| w.message.contains("Apply Intelligently"))
+    );
+}
+
+#[test]
+fn migrate_copilot_on_demand_sets_discovery() {
+    let content = r#"---
+description: Use when writing database migrations
+---
+body
+"#;
+    let options = MigrateOptions {
+        from: RuleFormat::Copilot,
+        to: RuleFormat::Agents,
+        filename_hint: Some("migration-guidelines".to_string()),
+        ..Default::default()
+    };
+    let result = migrate_string(content, &options).expect("migrate");
+    assert!(result.content.contains("trigger: auto"));
+    assert!(result.content.contains("discovery: true"));
+    assert!(!result.content.contains("paths:"));
+}
+
+#[test]
+fn migrate_discovery_to_cursor_emits_apply_intelligently() {
+    let content = r#"---
+name: graphql-patterns
+description: GraphQL conventions
+trigger: auto
+discovery: true
+paths:
+  - "src/graphql/**"
+---
+body
+"#;
+    let options = MigrateOptions {
+        from: RuleFormat::Agents,
+        to: RuleFormat::Cursor,
+        ..Default::default()
+    };
+    let result = migrate_string(content, &options).expect("migrate");
+    assert!(result.content.contains("description:"));
+    assert!(!result.content.contains("globs:"));
+    assert!(!result.content.contains("alwaysApply"));
+    assert!(
+        result
+            .warnings
+            .iter()
+            .any(|w| w.message.contains("Apply Intelligently"))
+    );
+}
+
+#[test]
+fn migrate_discovery_to_windsurf_emits_model_decision() {
+    let content = r#"---
+name: graphql-patterns
+description: GraphQL conventions
+trigger: auto
+discovery: true
+---
+body
+"#;
+    let options = MigrateOptions {
+        from: RuleFormat::Agents,
+        to: RuleFormat::Windsurf,
+        ..Default::default()
+    };
+    let result = migrate_string(content, &options).expect("migrate");
+    assert!(result.content.contains("trigger: model_decision"));
 }
 
 #[test]

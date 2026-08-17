@@ -1,5 +1,5 @@
 use agent_rules_tool::lint::lint_string;
-use agent_rules_tool::spec::{SCHEMA_URL, SPEC_COMMIT};
+use agent_rules_tool::spec::{RFC_DISCOVERY, SCHEMA_URL, SPEC_COMMIT};
 use agent_rules_tool::{LintOptions, Severity, load_spec_index};
 use std::path::PathBuf;
 
@@ -30,7 +30,7 @@ fn lint_vendored_examples_are_valid() {
         .iter()
         .filter(|e| e.vendored.starts_with("examples/"))
         .collect();
-    assert_eq!(examples.len(), 3);
+    assert_eq!(examples.len(), 4);
 
     for entry in examples {
         let path = spec_root().join(&entry.vendored);
@@ -47,7 +47,28 @@ fn lint_vendored_examples_are_valid() {
             },
         )
         .expect("lint should succeed");
-        assert!(report.valid, "expected valid: {}", entry.vendored);
+        let errors: Vec<_> = report
+            .violations
+            .iter()
+            .filter(|v| v.severity == Severity::Error)
+            .collect();
+        assert!(
+            errors.is_empty(),
+            "expected no errors in {}: {errors:?}",
+            entry.vendored
+        );
+        if entry.vendored.ends_with("discovery-exploration.md") {
+            assert!(
+                report
+                    .violations
+                    .iter()
+                    .any(|v| v.field == "discovery" && v.severity == Severity::Warn),
+                "expected discovery warning in {}",
+                entry.vendored
+            );
+        } else {
+            assert!(report.valid, "expected valid: {}", entry.vendored);
+        }
     }
 }
 
@@ -64,5 +85,63 @@ body
     assert!(
         report.violations.iter().any(|v| v.spec_ref == SCHEMA_URL),
         "expected schema citation in violations"
+    );
+}
+
+#[test]
+fn lint_discovery_true_warns_and_relaxes_auto_scope() {
+    let content = r#"---
+name: draft-rule
+description: Scope still being determined
+trigger: auto
+discovery: true
+---
+body
+"#;
+    let report = lint_string(
+        content,
+        &LintOptions {
+            filename_hint: Some("draft-rule".to_string()),
+            ..Default::default()
+        },
+    )
+    .expect("lint should run");
+    assert!(!report.valid);
+    assert!(
+        report
+            .violations
+            .iter()
+            .all(|v| v.severity == Severity::Warn)
+    );
+    assert!(
+        report
+            .violations
+            .iter()
+            .any(|v| v.field == "discovery" && v.spec_ref == RFC_DISCOVERY)
+    );
+    assert!(
+        report
+            .violations
+            .iter()
+            .any(|v| v.field == "trigger" && v.spec_ref == RFC_DISCOVERY)
+    );
+}
+
+#[test]
+fn lint_auto_without_scope_is_error_when_not_discovery() {
+    let content = r#"---
+name: finalized
+description: Missing scope
+trigger: auto
+---
+body
+"#;
+    let report = lint_string(content, &LintOptions::default()).expect("lint should run");
+    assert!(!report.valid);
+    assert!(
+        report
+            .violations
+            .iter()
+            .any(|v| v.field == "trigger" && v.severity == Severity::Error)
     );
 }
